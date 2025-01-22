@@ -1,36 +1,43 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setIsLoggedIn(false);
+    navigate("/login");
+  };
+
   return (
-    <header className="flex justify-between items-center px-8 py-4 bg-gradient-to-r from-teal-500 to-blue-500 text-white border-b-4 border-teal-800">
-      <h1 className="text-4xl font-extrabold">
-        <span className="text-yellow-300">Template</span> Builder
-      </h1>
-
-      <nav className="space-x-6">
-        <a
-          href="#login"
-          className="text-lg font-medium hover:underline transition duration-300 ease-in-out transform hover:scale-105"
-          aria-label="Login Page"
-        >
-          Login
-        </a>
-        <a
-          href="#signup"
-          className="text-lg font-medium hover:underline transition duration-300 ease-in-out transform hover:scale-105"
-          aria-label="Signup Page"
-        >
-          Signup
-        </a>
-        <a
-          href="#about"
-          className="text-lg font-medium hover:underline transition duration-300 ease-in-out transform hover:scale-105"
-          aria-label="About Page"
-        >
-          About
-        </a>
-      </nav>
-    </header>
+    <nav className="bg-gray-900 text-gray-100 py-4 px-6 flex justify-between items-center">
+      <Link to="/" className="text-2xl font-bold text-green-400">
+        Resume Builder
+      </Link>
+      <div>
+        <Link to="/templates" className="mr-4">
+          Templates
+        </Link>
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-4 py-2 rounded-md text-white"
+          >
+            Logout
+          </button>
+        ) : (
+          <>
+            <Link to="/login" className="mr-4">
+              Login
+            </Link>
+            <Link to="/signup" className="bg-green-500 px-4 py-2 rounded-md text-white">
+              Sign Up
+            </Link>
+          </>
+        )}
+      </div>
+    </nav>
   );
 };
 
