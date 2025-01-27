@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import TemplatePages from "./pages/TemplatePages";
 import Homepage from "./pages/Homepage";
@@ -14,7 +14,7 @@ import Template6 from "./Templates/Template6";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("userData")
+    !!localStorage.getItem("currentUser") // Check if a user is logged in based on localStorage
   );
 
   return (
@@ -22,16 +22,11 @@ const App = () => {
       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/templates" element={<TemplatePages />} />
+        <Route path="/templates" element={<TemplatePages isLoggedIn={isLoggedIn} />} />
         <Route path="/template1" element={<ResumeTemplate />} />
-        <Route
-          path="/signup"
-          element={<SignUp setIsLoggedIn={setIsLoggedIn} />}
-        />
-        <Route
-          path="/login"
-          element={<Login setIsLoggedIn={setIsLoggedIn} />}
-        />
+        <Route path="/signup" element={<SignUp setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/register" element={<Navigate to="/signup" />} /> {/* Redirect route */}
+        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/template2" element={<Template2 />} />
         <Route path="/template3" element={<Template3 />} />
         <Route path="/template4" element={<Template4 />} />

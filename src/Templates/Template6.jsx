@@ -1,278 +1,224 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useRef } from "react";
 import html2pdf from "html2pdf.js";
-import { FaEnvelope, FaPhoneAlt, FaLinkedin, FaBriefcase, FaGraduationCap, FaCode } from "react-icons/fa";
+import { FaEnvelope, FaPhone, FaLinkedin, FaGithub } from "react-icons/fa";
 
-const Template6 = () => {
+const FacebookTemplate = () => {
   const resumeRef = useRef(null);
-  const [fontColor, setFontColor] = useState("black");
-  const [fontFamily, setFontFamily] = useState("Arial");
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+  const [textColor, setTextColor] = useState("#1c1e21"); // Dark text color for Facebook-style theme
+  const [fontFamily, setFontFamily] = useState("Segoe UI");
+  const [iconColor, setIconColor] = useState("#4267B2"); // Facebook blue color
 
   const handleDownloadPdf = () => {
     const element = resumeRef.current;
 
     const options = {
       margin: [0.5, 0.5],
-      filename: "resume.pdf",
+      filename: "facebook_style_resume.pdf",
       image: { type: "jpeg", quality: 1 },
-      html2canvas: { scale: 3, logging: false, useCORS: true },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+      html2canvas: {
+        scale: 3,
+        logging: false,
+        useCORS: true,
+        backgroundColor: "#fff",
+      },
+      jsPDF: {
+        unit: "in",
+        format: "a4",
+        orientation: "portrait",
+      },
     };
 
     html2pdf().set(options).from(element).save();
   };
 
-  const handleFontColorChange = (color) => {
-    setFontColor(color);
-    applySelectionStyles(color, fontFamily);
-  };
-
-  const handleFontFamilyChange = (family) => {
-    setFontFamily(family);
-    applySelectionStyles(fontColor, family);
-  };
-
-  const applySelectionStyles = (color, family) => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const selectedText = range.cloneContents();
-      const span = document.createElement("span");
-      span.style.color = color;
-      span.style.fontFamily = family;
-      span.appendChild(selectedText);
-
-      range.deleteContents();
-      range.insertNode(span);
+  const handleTextSelection = () => {
+    const selection = window.getSelection().toString();
+    if (selection) {
+      setSelectedText(selection);
+      setShowPopup(true);
     }
   };
 
+  const applyStyleToSelectedText = () => {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const span = document.createElement("span");
+    span.style.color = textColor;
+    span.style.fontFamily = fontFamily;
+    range.surroundContents(span);
+
+    // Close popup after applying changes
+    setShowPopup(false);
+  };
+
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      {/* Font Control Section */}
-      <div className="flex justify-end mb-6 gap-4">
-        <button
-          onClick={() => handleFontColorChange("red")}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700"
-        >
-          Red Color
-        </button>
-        <button
-          onClick={() => handleFontColorChange("blue")}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700"
-        >
-          Blue Color
-        </button>
-        <button
-          onClick={() => handleFontColorChange("green")}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700"
-        >
-          Green Color
-        </button>
-        <button
-          onClick={() => handleFontColorChange("purple")}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700"
-        >
-          Purple Color
-        </button>
-        <button
-          onClick={() => handleFontColorChange("orange")}
-          className="px-4 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700"
-        >
-          Orange Color
-        </button>
-
-        <button
-          onClick={() => handleFontFamilyChange("Courier New")}
-          className="px-4 py-2 bg-yellow-600 text-white rounded-lg shadow-md hover:bg-yellow-700"
-        >
-          Courier Font
-        </button>
-        <button
-          onClick={() => handleFontFamilyChange("Times New Roman")}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700"
-        >
-          Times Font
-        </button>
-        <button
-          onClick={() => handleFontFamilyChange("Georgia")}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700"
-        >
-          Georgia Font
-        </button>
-        <button
-          onClick={() => handleFontFamilyChange("Verdana")}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700"
-        >
-          Verdana Font
-        </button>
-        <button
-          onClick={() => handleFontFamilyChange("Tahoma")}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700"
-        >
-          Tahoma Font
-        </button>
-
+    <div className="p-8 bg-gradient-to-r from-blue-600 to-indigo-600 min-h-screen">
+      {/* Download Button */}
+      <div className="flex justify-end mb-6">
         <button
           onClick={handleDownloadPdf}
-          className="px-6 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700"
+          className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-600"
         >
           Download PDF
         </button>
       </div>
 
-      {/* Resume Template */}
+      {/* Resume Preview */}
       <div
         ref={resumeRef}
-        className="bg-white shadow-lg rounded-lg border border-gray-300 p-8 mx-auto"
+        contentEditable
+        suppressContentEditableWarning={true}
+        className="bg-white shadow-2xl rounded-xl border border-gray-300 p-8 mx-auto"
         style={{
           width: "8.27in",
           minHeight: "11.69in",
+          overflow: "hidden",
           fontSize: "14px",
-          color: fontColor,
+          fontFamily: fontFamily,
         }}
+        onMouseUp={handleTextSelection} // Detect text selection
       >
         {/* Header Section */}
-        <div className="text-center border-b pb-6">
-          <h1
-            className="text-5xl font-bold text-gray-800"
-            contentEditable="true"
-            suppressContentEditableWarning={true}
-          >
-            John Doe
-          </h1>
-          <p
-            className="text-lg text-gray-600"
-            contentEditable="true"
-            suppressContentEditableWarning={true}
-          >
-            Full Stack Developer
-          </p>
-          <div className="flex justify-center gap-4 mt-4 text-gray-600">
-            <div className="flex items-center gap-2">
-              <FaEnvelope className="text-green-500" />
-              <span contentEditable="true" suppressContentEditableWarning={true}>
-                john.doe@example.com
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FaPhoneAlt className="text-green-500" />
-              <span contentEditable="true" suppressContentEditableWarning={true}>
-                +1 234 567 890
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FaLinkedin className="text-green-500" />
-              <span contentEditable="true" suppressContentEditableWarning={true}>
-                /in/johndoe
-              </span>
-            </div>
+        <div className="flex items-center justify-between bg-blue-600 text-white rounded-t-lg px-8 py-6">
+          <div>
+            <h1 className="text-4xl font-bold">Your Name</h1>
+            <h2 className="text-lg font-medium">Full-Stack Developer</h2>
           </div>
         </div>
 
-        {/* About Section */}
-        <div className="mt-8">
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4">About Me</h3>
-          <p
-            className="text-gray-700"
-            contentEditable="true"
-            suppressContentEditableWarning={true}
-          >
-            A passionate Full Stack Developer with 5+ years of experience
-            building scalable web applications and interactive user interfaces.
-            Skilled in React, Node.js, and cloud deployment.
+        {/* Contact Section */}
+        <div className="flex justify-around mt-6 text-gray-700">
+          <p className="flex items-center gap-2">
+            <FaEnvelope className="text-facebook-icon" style={{ color: iconColor }} /> your.email@example.com
+          </p>
+          <p className="flex items-center gap-2">
+            <FaPhone className="text-facebook-icon" style={{ color: iconColor }} /> 123-456-7890
+          </p>
+          <p className="flex items-center gap-2">
+            <FaLinkedin className="text-facebook-icon" style={{ color: iconColor }} /> linkedin.com/in/yourprofile
+          </p>
+          <p className="flex items-center gap-2">
+            <FaGithub className="text-facebook-icon" style={{ color: iconColor }} /> github.com/yourusername
           </p>
         </div>
 
         {/* Experience Section */}
         <div className="mt-8">
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-            <FaBriefcase className="inline-block text-green-500 mr-2" />
-            Experience
-          </h3>
+          <h3 className="text-2xl font-semibold text-facebook-primary border-b-2 border-blue-300 pb-1">Experience</h3>
           <div className="mt-4">
-            <h4
-              className="text-xl font-semibold text-gray-800"
-              contentEditable="true"
-              suppressContentEditableWarning={true}
-            >
-              Software Engineer - Google
-            </h4>
-            <p className="italic text-gray-600">Jan 2020 - Present</p>
-            <ul className="list-disc list-inside mt-2 text-gray-700">
-              <li contentEditable="true" suppressContentEditableWarning={true}>
-                Developed and optimized scalable web apps using React and Node.js.
-              </li>
-              <li contentEditable="true" suppressContentEditableWarning={true}>
-                Improved app performance, reducing load time by 35%.
-              </li>
-              <li contentEditable="true" suppressContentEditableWarning={true}>
-                Collaborated with cross-functional teams to deliver key features.
-              </li>
-            </ul>
-          </div>
-          <div className="mt-6">
-            <h4
-              className="text-xl font-semibold text-gray-800"
-              contentEditable="true"
-              suppressContentEditableWarning={true}
-            >
-              Front-End Developer - Facebook
-            </h4>
-            <p className="italic text-gray-600">May 2017 - Dec 2019</p>
-            <ul className="list-disc list-inside mt-2 text-gray-700">
-              <li contentEditable="true" suppressContentEditableWarning={true}>
-                Designed engaging UIs using React and Tailwind CSS.
-              </li>
-              <li contentEditable="true" suppressContentEditableWarning={true}>
-                Enhanced accessibility and user experience across platforms.
-              </li>
-              <li contentEditable="true" suppressContentEditableWarning={true}>
-                Worked closely with designers to implement pixel-perfect designs.
-              </li>
+            <h4 className="text-lg font-semibold text-facebook-dark">Google LLC</h4>
+            <p className="italic text-facebook-light">Software Engineer (2020 - Present)</p>
+            <ul className="list-disc list-inside mt-2 text-facebook-dark">
+              <li>Designed scalable microservices for Google Cloud Platform.</li>
+              <li>Optimized search algorithms, improving performance by 40%.</li>
+              <li>Mentored junior developers and conducted code reviews.</li>
             </ul>
           </div>
         </div>
 
         {/* Education Section */}
         <div className="mt-8">
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-            <FaGraduationCap className="inline-block text-green-500 mr-2" />
-            Education
-          </h3>
+          <h3 className="text-2xl font-semibold text-facebook-primary border-b-2 border-blue-300 pb-1">Education</h3>
           <div className="mt-4">
-            <h4
-              className="text-xl font-semibold text-gray-800"
-              contentEditable="true"
-              suppressContentEditableWarning={true}
-            >
-              Bachelor's in Computer Science
-            </h4>
-            <p className="italic text-gray-600">XYZ University</p>
-            <p className="text-gray-700">Graduated: 2017</p>
+            <h4 className="text-lg font-semibold text-facebook-dark">Stanford University</h4>
+            <p className="italic text-facebook-light">BSc in Computer Science (2016 - 2020)</p>
+            <p className="mt-2 text-facebook-dark">Specialized in Software Engineering and AI.</p>
           </div>
         </div>
 
         {/* Skills Section */}
         <div className="mt-8">
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-            <FaCode className="inline-block text-green-500 mr-2" />
-            Skills
-          </h3>
-          <ul className="list-disc list-inside mt-2 text-gray-700">
-            <li contentEditable="true" suppressContentEditableWarning={true}>
-              React, Node.js, Express
-            </li>
-            <li contentEditable="true" suppressContentEditableWarning={true}>
-              JavaScript, TypeScript, HTML, CSS
-            </li>
-            <li contentEditable="true" suppressContentEditableWarning={true}>
-              MongoDB, MySQL, PostgreSQL
-            </li>
-          </ul>
+          <h3 className="text-2xl font-semibold text-facebook-primary border-b-2 border-blue-300 pb-1">Skills</h3>
+          <div className="flex flex-wrap gap-4 mt-4">
+            <span className="px-4 py-2 bg-facebook-skill text-white rounded-full shadow">React</span>
+            <span className="px-4 py-2 bg-facebook-skill text-white rounded-full shadow">Next.js</span>
+            <span className="px-4 py-2 bg-facebook-skill text-white rounded-full shadow">TypeScript</span>
+            <span className="px-4 py-2 bg-facebook-skill text-white rounded-full shadow">GraphQL</span>
+            <span className="px-4 py-2 bg-facebook-skill text-white rounded-full shadow">Python</span>
+            <span className="px-4 py-2 bg-facebook-skill text-white rounded-full shadow">Machine Learning</span>
+          </div>
+        </div>
+
+        {/* Projects Section */}
+        <div className="mt-8">
+          <h3 className="text-2xl font-semibold text-facebook-primary border-b-2 border-blue-300 pb-1">Projects</h3>
+          <div className="mt-4">
+            <h4 className="text-lg font-semibold text-facebook-dark">E-Commerce Platform</h4>
+            <p className="mt-2 text-facebook-dark">
+              Built a robust e-commerce platform with advanced search and real-time analytics.
+            </p>
+          </div>
+          <div className="mt-4">
+            <h4 className="text-lg font-semibold text-facebook-dark">AI-Powered Chatbot</h4>
+            <p className="mt-2 text-facebook-dark">
+              Developed an intelligent chatbot using NLP to improve customer support.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-facebook-light text-sm">
+          * Click any section to edit content. All changes are reflected in the PDF download.
         </div>
       </div>
+
+      {/* Popup for Text Customization */}
+      {showPopup && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">Customize Text</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Text Color</label>
+              <input
+                type="color"
+                value={textColor}
+                onChange={(e) => setTextColor(e.target.value)}
+                className="w-16 h-10"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Font Family</label>
+              <select
+                value={fontFamily}
+                onChange={(e) => setFontFamily(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="Arial">Arial</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Icon Color</label>
+              <input
+                type="color"
+                value={iconColor}
+                onChange={(e) => setIconColor(e.target.value)}
+                className="w-16 h-10"
+              />
+            </div>
+            <button
+              onClick={applyStyleToSelectedText}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              Apply
+            </button>
+            <button
+              onClick={() => setShowPopup(false)}
+              className="ml-4 px-6 py-2 bg-red-600 text-white rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default Template6;
+export default FacebookTemplate;

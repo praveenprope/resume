@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { toast, Toaster } from "react-hot-toast";
 import img_1 from "../assets/image1.jpg";
 import img_2 from "../assets/image2.jpg";
 import img_3 from "../assets/image3.jpg";
@@ -8,7 +8,7 @@ import img_4 from "../assets/image4.jpg";
 import img_5 from "../assets/image5.jpg";
 import img_6 from "../assets/image6.jpg";
 
-const Home = () => {
+const TemplatePage = ({ isLoggedIn }) => {
   const navigate = useNavigate();
 
   const templates = [
@@ -20,75 +20,126 @@ const Home = () => {
     { id: 6, name: "Elegant Template", route: "/template6", image: img_6 },
   ];
 
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+  const handleTemplateClick = (template) => {
+    setSelectedTemplate(template);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTemplate(null);
+  };
+
+  const handleUseTemplate = (template) => {
+    if (isLoggedIn) {
+      toast.success(`Navigating to ${template.name}!`);
+      setTimeout(() => {
+        navigate(template.route);
+      }, 1500);
+    } else {
+      toast.error("Please log in to use this template.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    }
+  };
+
   return (
-    <div>
-      {/* Navbar Section */}
-      
-
-      {/* Main Content */}
-      <div
-        className="p-8 min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white"
-      >
-        {/* Heading Section */}
-        <h1 className="text-5xl md:text-6xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-pink-500 to-purple-600 mb-12">
-          Choose Your <span className="px-3 py-1 rounded-full bg-gradient-to-r from-pink-500 to-purple-700 text-black">Resume Template</span>
-        </h1>
-
-        {/* Templates Grid Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-          {templates.map((template) => (
-            <TemplateCard
-              key={template.id}
-              template={template}
-              navigate={navigate}
-            />
-          ))}
+    <div className="bg-white text-gray-800">
+      <Toaster position="top-right" reverseOrder={false} />
+      {/* Templates Section */}
+      <section id="templates" className="py-16 bg-[#ffffff]">
+        <div className="container mx-auto text-center">
+          <h3 className="text-4xl font-bold mb-8 text-[#f59f7a]">
+            Choose Your Template
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {templates.map((template) => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                onTemplateClick={handleTemplateClick}
+              />
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Footer Section */}
-        <footer className="mt-12 text-center font-medium text-white/80">
-          <p className="text-lg">
-            <span className="bg-gradient-to-r from-blue-500 to-purple-700 px-3 py-1 rounded-full">&copy; 2025</span> Praveen's Resume Builder | Designed with ❤️
+      {/* Modal */}
+      {selectedTemplate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-hidden overflow-y-scroll">
+          <div className="bg-white rounded-lg shadow-lg p-3 relative w-[90%] max-w-2xl mt-96">
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+              onClick={handleCloseModal}
+            >
+              ✕
+            </button>
+            <div className="">
+              <img
+                src={selectedTemplate.image}
+                alt={selectedTemplate.name}
+                className="w-full h-auto rounded-lg"
+              />
+            </div>
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-4 text-gray-800">
+                {selectedTemplate.name}
+              </h2>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={handleCloseModal}
+                  className="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-all"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => handleUseTemplate(selectedTemplate)}
+                  className="px-6 py-3 bg-[#5dc8cf] text-white rounded-xl hover:bg-blue-600 transition-all"
+                >
+                  Use This Template
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer className="bg-[#5dc8cf] text-black py-10 mt-8 border-t border-black">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-lg font-medium text-white">
+            &copy; 2025 TemplateGen | Designed with ❤️ by Praveen Kumar
           </p>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
-// Template Card Component
-const TemplateCard = ({ template, navigate }) => {
+const TemplateCard = ({ template, onTemplateClick }) => {
   return (
     <div
-      className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-      style={{
-        boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)",
-      }}
+      className="group bg-white rounded-lg shadow-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-2xl cursor-pointer"
+      onClick={() => onTemplateClick(template)}
     >
-      {/* Image Section */}
-      <div className="h-48 relative overflow-hidden border-b border-white/10">
+      <div className="h-48 overflow-hidden">
         <img
           src={template.image}
           alt={`${template.name} Preview`}
-          className="w-full h-full object-cover object-center transform transition-transform group-hover:scale-110"
+          className="w-full h-full object-top object-cover group-hover:scale-110 transition-transform"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
       </div>
-
-      {/* Content Section */}
       <div className="p-6 text-center">
-        <h2 className="text-xl font-bold text-white/90 group-hover:text-white tracking-wide mb-3">
+        <h2 className="text-xl font-bold mb-4 text-gray-800">
           {template.name}
         </h2>
-        <button
-          onClick={() => navigate(template.route)}
-          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-medium text-sm border-2 border-transparent hover:shadow-[0_0_15px_5px_rgba(91,134,229,0.8)] transition-all"
-        >
-          Select Template
-        </button>
+        <p className="text-sm text-gray-600">
+          Click to view full image and select
+        </p>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default TemplatePage;

@@ -1,9 +1,14 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import html2pdf from "html2pdf.js";
 import { FaEnvelope, FaPhone, FaLinkedin, FaGithub } from "react-icons/fa";
 
 const Template5 = () => {
   const resumeRef = useRef(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+  const [textColor, setTextColor] = useState("#000000");
+  const [fontFamily, setFontFamily] = useState("Arial");
+  const [iconColor, setIconColor] = useState("#000000"); // State for icon color
 
   const handleDownloadPdf = () => {
     const element = resumeRef.current;
@@ -26,6 +31,26 @@ const Template5 = () => {
     };
 
     html2pdf().set(options).from(element).save();
+  };
+
+  const handleTextSelection = () => {
+    const selection = window.getSelection().toString();
+    if (selection) {
+      setSelectedText(selection);
+      setShowPopup(true);
+    }
+  };
+
+  const applyStyleToSelectedText = () => {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const span = document.createElement("span");
+    span.style.color = textColor;
+    span.style.fontFamily = fontFamily;
+    range.surroundContents(span);
+
+    // Close popup after applying changes
+    setShowPopup(false);
   };
 
   return (
@@ -52,6 +77,7 @@ const Template5 = () => {
           overflow: "hidden",
           fontSize: "14px",
         }}
+        onMouseUp={handleTextSelection} // Detect text selection
       >
         {/* Header Section */}
         <div className="flex items-center justify-between bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg px-8 py-6">
@@ -64,16 +90,16 @@ const Template5 = () => {
         {/* Contact Section */}
         <div className="flex justify-around mt-6 text-gray-700">
           <p className="flex items-center gap-2">
-            <FaEnvelope className="text-blue-600" /> your.email@example.com
+            <FaEnvelope className="text-blue-600" style={{ color: iconColor }} /> your.email@example.com
           </p>
           <p className="flex items-center gap-2">
-            <FaPhone className="text-blue-600" /> 123-456-7890
+            <FaPhone className="text-blue-600" style={{ color: iconColor }} /> 123-456-7890
           </p>
           <p className="flex items-center gap-2">
-            <FaLinkedin className="text-blue-600" /> linkedin.com/in/yourprofile
+            <FaLinkedin className="text-blue-600" style={{ color: iconColor }} /> linkedin.com/in/yourprofile
           </p>
           <p className="flex items-center gap-2">
-            <FaGithub className="text-blue-600" /> github.com/yourusername
+            <FaGithub className="text-blue-600" style={{ color: iconColor }} /> github.com/yourusername
           </p>
         </div>
 
@@ -136,6 +162,59 @@ const Template5 = () => {
           * Click any section to edit content. All changes are reflected in the PDF download.
         </div>
       </div>
+
+      {/* Popup for Text Customization */}
+      {showPopup && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">Customize Text</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Text Color</label>
+              <input
+                type="color"
+                value={textColor}
+                onChange={(e) => setTextColor(e.target.value)}
+                className="w-16 h-10"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Font Family</label>
+              <select
+                value={fontFamily}
+                onChange={(e) => setFontFamily(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="Arial">Arial</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Icon Color</label>
+              <input
+                type="color"
+                value={iconColor}
+                onChange={(e) => setIconColor(e.target.value)}
+                className="w-16 h-10"
+              />
+            </div>
+            <button
+              onClick={applyStyleToSelectedText}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              Apply
+            </button>
+            <button
+              onClick={() => setShowPopup(false)}
+              className="ml-4 px-6 py-2 bg-red-600 text-white rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

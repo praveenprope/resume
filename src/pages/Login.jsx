@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CiMail, CiLock, CiRead, CiUnread } from "react-icons/ci";
+import signimg from "../assets/login.jpg";
 
 const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
@@ -7,6 +9,11 @@ const Login = ({ setIsLoggedIn }) => {
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -18,7 +25,6 @@ const Login = ({ setIsLoggedIn }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Retrieve users from localStorage
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const user = users.find(
       (user) =>
@@ -28,62 +34,95 @@ const Login = ({ setIsLoggedIn }) => {
     if (user) {
       alert("Login successful!");
       setIsLoggedIn(true);
-
-      // Save the logged-in user to localStorage
       localStorage.setItem("currentUser", JSON.stringify(user));
-      navigate("/templates"); // Navigate to templates or any other page
+      navigate("/templates");
     } else {
       alert("Invalid email or password. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex items-center justify-center px-6">
-      <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-md rounded-xl shadow-lg border border-white/20">
-        <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-yellow-300">
-          Login
-        </h1>
-        <form onSubmit={handleSubmit} className="mt-6">
-          <div className="mb-4">
-            <label
-              className="block text-sm font-medium mb-2 text-yellow-400"
-              htmlFor="email"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Your Email"
-              className="w-full px-4 py-2 bg-gray-800 text-gray-100 rounded-lg border focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            />
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="flex shadow-lg rounded-lg bg-white">
+        {/* Left Section */}
+        <div
+          className="w-96 bg-cover rounded-l-lg"
+          style={{
+            backgroundImage: `url(${signimg})`, // Update with the correct path
+          }}
+        ></div>
+
+        {/* Right Section */}
+        <form onSubmit={handleSubmit} className="flex flex-col p-10 space-y-6">
+          <h4 className="text-3xl font-bold text-gray-800">Login</h4>
+          <p className="text-base text-gray-600">
+            Access your account and start creating templates!
+          </p>
+
+          {/* Email Input */}
+          <div className="relative">
+            <div className="flex items-center">
+              <CiMail className="text-2xl text-gray-500 mr-3" />
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                required
+              />
+            </div>
           </div>
-          <div className="mb-6">
-            <label
-              className="block text-sm font-medium mb-2 text-yellow-400"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Your Password"
-              className="w-full px-4 py-2 bg-gray-800 text-gray-100 rounded-lg border focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            />
+
+          {/* Password Input */}
+          <div className="relative">
+            <div className="flex items-center">
+              <CiLock className="text-2xl text-gray-500 mr-3" />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                required
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="ml-2 focus:outline-none"
+              >
+                {showPassword ? (
+                  <CiRead className="text-2xl text-gray-500" />
+                ) : (
+                  <CiUnread className="text-2xl text-gray-500" />
+                )}
+              </button>
+            </div>
           </div>
+
           <button
             type="submit"
-            className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-red-600 text-white font-medium rounded-full shadow-lg hover:shadow-lg transition-all duration-300"
+            className="w-full py-4 text-lg rounded focus:outline-none bg-[#5dc8cf] text-white border-2 border-transparent hover:border-black hover:text-[#5dc8cf] hover:bg-white transition-all duration-300"
           >
             Login
           </button>
+
+
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{" "}
+              <span
+                onClick={() => navigate("/register")}
+                className="text-indigo-500 underline cursor-pointer"
+              >
+                Register here
+              </span>
+            </p>
+          </div>
         </form>
       </div>
     </div>

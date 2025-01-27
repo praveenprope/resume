@@ -23,7 +23,7 @@ const MultiImageSlider = () => {
   }, []);
 
   return (
-    <div className="relative w-full w-3/4 mx-auto overflow-hidden rounded-xl shadow-2xl">
+    <div className="relative w-full w-4/6 mx-auto overflow-hidden rounded-xl shadow-2xl">
       {/* Image Wrapper */}
       <div
         className="flex transition-transform duration-1000 ease-in-out w-1/3 "
